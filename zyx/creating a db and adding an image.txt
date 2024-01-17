@@ -1,0 +1,39 @@
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('chad.db');
+
+
+const fs = require('fs');
+
+// Function to read image file as binary data
+function readImageFile(filePath) {
+  try {
+    const buffer = fs.readFileSync(filePath);
+    return buffer;
+  } catch (error) {
+    console.error('Error reading image file:', error);
+    return null;
+  }
+}
+
+// Example usage with a local file path
+const localImagePath = 'C:/Users/Fioke/Downloads/max.jfif';
+
+const imageBuffer = readImageFile(localImagePath);
+
+if (imageBuffer) {
+  // Now you can use imageBuffer as the binary data for the image in your database insert statement
+  // For example, when inserting a product with an image:
+  const insertProduct = db.prepare(`INSERT INTO products (name, price, category, image, description, availability) VALUES (?, ?, ?, ?, ?, ?)`);
+
+  const productData = ['ProductWithImage', 39.99, 'Electronics', imageBuffer, 'Description for ProductWithImage', true];
+
+  insertProduct.run(productData, err => {
+    if (err) {
+      console.error('Error inserting product with image:', err);
+    } else {
+      console.log('Product with image inserted successfully');
+    }
+  });
+
+  insertProduct.finalize();
+}
